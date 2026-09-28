@@ -1,0 +1,10 @@
+# Keeps the SHA-pinned actions (setup-python in action.yml, checkout and
+# setup-python in CI) current; Dependabot rewrites the pin and its comment.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7

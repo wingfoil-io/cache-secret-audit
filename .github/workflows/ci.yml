@@ -1,0 +1,69 @@
+name: ci
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  pytest:
+    name: pytest (${{ matrix.python }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: [ "3.10", "3.11", "3.12", "3.13" ]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install --disable-pip-version-check "pyyaml==6.0.3" "pytest==9.1.1"
+      - run: python -m pytest -q
+
+  action:
+    name: action (uses ./)
+    needs: pytest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # `uses: ./` on purpose: this job tests the action exactly as this commit
+    # has it, before any tag points at it.
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Clean fixtures must pass
+        uses: ./ # zizmor: ignore[self-repository]
+        with:
+          path: tests/fixtures/pass
+      - name: wingfoil snapshot must run
+        uses: ./ # zizmor: ignore[self-repository]
+        with:
+          path: tests/fixtures/wingfoil
+          fail: "false"
+      - name: The disclosed layout must fail
+        id: repro
+        continue-on-error: true
+        uses: ./ # zizmor: ignore[self-repository]
+        with:
+          path: tests/fixtures/fail/miri-repro.yml
+      - name: Check that it did
+        env:
+          OUTCOME: ${{ steps.repro.outcome }}
+        run: test "$OUTCOME" = failure
+      - name: Audit this repository's own workflows
+        uses: ./ # zizmor: ignore[self-repository]
+        with:
+          min-severity: low

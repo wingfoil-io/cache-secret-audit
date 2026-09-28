@@ -1,0 +1,10 @@
+# pull_request_target runs in the base branch's cache scope: medium, not low.
+on: pull_request_target
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache
+          key: tools
