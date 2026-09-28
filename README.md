@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: wingfoil-io/cache-secret-audit@<SHA> # v0.1.0
+      - uses: wingfoil-io/cache-secret-audit@81a5c940a8227f13fee80d1fd0a784a0d52468bd # v0.1.0
         with:
           path: .github/workflows   # default
           min-severity: medium      # low | medium | high
