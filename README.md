@@ -1,5 +1,7 @@
 # cache-secret-audit
 
+[![ci](https://github.com/wingfoil-io/cache-secret-audit/actions/workflows/ci.yml/badge.svg)](https://github.com/wingfoil-io/cache-secret-audit/actions/workflows/ci.yml)
+
 A GitHub Action that finds workflow layouts where a secret can end up in a
 build cache a pull request can read. In September 2026 the Rust project
 disclosed that `cargo miri` wrote the full process environment into
@@ -238,6 +240,10 @@ the rules separate a safe setup from the Miri one.
 
 A rule that zizmor could reasonably host should go to zizmor. A zizmor issue
 proposing these checks will be linked here once it is open.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
